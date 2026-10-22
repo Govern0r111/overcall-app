@@ -1,0 +1,71 @@
+{
+  "provider": "openai",
+  "version": "2026-01-15",
+  "effective_from": "2026-01-15T00:00:00Z",
+  "retrieved_at": "2026-10-22",
+  "source_url": "https://developers.openai.com/api/docs/pricing",
+  "currency": "USD",
+  "models": {
+    "gpt-4o": {
+      "tier": "high",
+      "input_per_1m": 2.5,
+      "cached_input_per_1m": 1.25,
+      "output_per_1m": 10.0
+    },
+    "gpt-4.1": {
+      "tier": "high",
+      "input_per_1m": 2.0,
+      "cached_input_per_1m": 0.5,
+      "output_per_1m": 8.0
+    },
+    "gpt-4o-mini": {
+      "tier": "low",
+      "input_per_1m": 0.15,
+      "cached_input_per_1m": 0.075,
+      "output_per_1m": 0.6
+    },
+    "gpt-4.1-mini": {
+      "tier": "low",
+      "input_per_1m": 0.4,
+      "cached_input_per_1m": 0.1,
+      "output_per_1m": 1.6
+    },
+    "text-embedding-3-small": {
+      "tier": "low",
+      "input_per_1m": 0.02,
+      "cached_input_per_1m": 0.02,
+      "output_per_1m": 0.0
+    },
+    "text-embedding-3-large": {
+      "tier": "low",
+      "input_per_1m": 0.13,
+      "cached_input_per_1m": 0.13,
+      "output_per_1m": 0.0
+    }
+  },
+  "default_model": "gpt-4o-mini",
+  "per_request_overhead_usd": 0.0,
+  "failed_request_overhead_usd": 0.0,
+  "chat_endpoints": ["/v1/chat/completions"],
+  "deterministic_post_endpoints": ["/v1/embeddings", "/v1/moderations"],
+  "downgrade_map": {
+    "gpt-4o": "gpt-4o-mini",
+    "gpt-4.1": "gpt-4.1-mini"
+  },
+  "batch_equivalents": {
+    "POST /v1/embeddings": {
+      "method": "Submit offline embedding jobs through the OpenAI Batch API.",
+      "discount": 0.5,
+      "basis": "The OpenAI Batch API pricing documentation advertises a 50% discount for eligible batch requests; ordinary array input alone does not reduce per-token prices. https://developers.openai.com/api/docs/guides/batch",
+      "fix": "Collect eligible embedding requests and submit them through the Batch API when asynchronous completion is acceptable."
+    }
+  },
+  "supported": true,
+  "legacy": {
+    "upstream": {
+      "real": "https://api.openai.com"
+    },
+    "failed_request_cost_usd": 0.0,
+    "per_request_overhead_usd": 0.0
+  }
+}

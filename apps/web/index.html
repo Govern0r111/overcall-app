@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Point your API base URL at Overcall. We log request metadata, spot wasteful patterns and show what fixing them would save."
+    />
+    <link rel="canonical" href="__VITE_SITE_URL__/" />
+    <link
+      rel="preload"
+      href="/fonts/inter-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/jetbrains-mono-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Overcall — See where your API money goes" />
+    <meta
+      property="og:description"
+      content="Spot wasteful API patterns and see what fixing them could save."
+    />
+    <meta property="og:url" content="__VITE_SITE_URL__/" />
+    <meta property="og:image" content="__VITE_SITE_URL__/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Overcall — See where your API money goes" />
+    <meta
+      name="twitter:description"
+      content="Spot wasteful API patterns and see what fixing them could save."
+    />
+    <meta name="twitter:image" content="__VITE_SITE_URL__/og.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Overcall — See where your API money goes</title>
+    <script>
+      (() => {
+        let preference = "system";
+        try {
+          const stored = localStorage.getItem("overcall-theme");
+          if (stored === "light" || stored === "dark") preference = stored;
+        } catch {}
+        const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div id="root"></div>
+    <noscript>
+      <main class="noscript-content">
+        <h1>See where your API money goes</h1>
+        <p>
+          Overcall logs request metadata, spots wasteful patterns and shows what fixing them could
+          save. Your request and response bodies are not stored.
+        </p>
+        <p>Enable JavaScript to explore the dashboard and sign in.</p>
+      </main>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://overcall.app/schemas/pricing.schema.json",
+  "title": "Overcall provider pricing file",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "provider",
+    "version",
+    "effective_from",
+    "retrieved_at",
+    "source_url",
+    "currency",
+    "models",
+    "default_model",
+    "per_request_overhead_usd",
+    "failed_request_overhead_usd",
+    "chat_endpoints",
+    "deterministic_post_endpoints",
+    "downgrade_map",
+    "batch_equivalents",
+    "supported"
+  ],
+  "properties": {
+    "provider": {
+      "enum": ["openai", "stripe", "aws"]
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "effective_from": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "retrieved_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "currency": {
+      "const": "USD"
+    },
+    "models": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/modelPrice"
+      }
+    },
+    "default_model": {
+      "type": ["string", "null"]
+    },
+    "per_request_overhead_usd": {
+      "type": "number",
+      "minimum": 0
+    },
+    "failed_request_overhead_usd": {
+      "type": "number",
+      "minimum": 0
+    },
+    "chat_endpoints": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "deterministic_post_endpoints": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "downgrade_map": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "batch_equivalents": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/batchEquivalent"
+      }
+    },
+    "supported": {
+      "type": "boolean"
+    },
+    "legacy": {
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "modelPrice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier", "input_per_1m", "cached_input_per_1m", "output_per_1m"],
+      "properties": {
+        "tier": {"enum": ["low", "high"]},
+        "input_per_1m": {"type": "number", "minimum": 0},
+        "cached_input_per_1m": {"type": "number", "minimum": 0},
+        "output_per_1m": {"type": "number", "minimum": 0}
+      }
+    },
+    "batchEquivalent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "discount", "basis", "fix"],
+      "properties": {
+        "method": {"type": "string", "minLength": 1},
+        "discount": {"type": "number", "minimum": 0, "maximum": 1},
+        "basis": {"type": "string", "minLength": 1},
+        "fix": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

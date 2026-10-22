@@ -1,0 +1,162 @@
+{
+  "project_title": "Overcall — Web App (Proxy + Detection Engine + Dashboard)",
+  "app_type": "dashboard (saas_app)",
+  "context": "Calm, transparent, developer-centric proxy monitoring dashboard. Overcall sits between web apps and paid APIs (OpenAI, Stripe, AWS, Anthropic, DeepSeek), logs traffic, detects wasteful usage patterns across 3 detection tiers, and quantifies real money saved.",
+  "theme_strategy": {
+    "philosophy": "Flat surfaces with 1px hairline borders, no gradients, no glassmorphism, no stacked shadows. Elevation reserved strictly for genuinely floating elements (dropdown menus, popovers).",
+    "hierarchy_rule": "One clear visual hierarchy per screen; max 4 type sizes per screen; sentence case everywhere.",
+    "fonts": {
+      "ui_body": "Inter, sans-serif",
+      "numeric_technical": "JetBrains Mono, Menlo, monospace"
+    },
+    "colors": {
+      "light": {
+        "background": "#FAFAF9",
+        "surface": "#FFFFFF",
+        "border": "#E5E5E3",
+        "text": "#1B1D22",
+        "muted": "#6B6F76",
+        "accent": "#35507A",
+        "savings": "#2F7D5A",
+        "warning": "#B8791A",
+        "critical": "#B3392C",
+        "divider": "#ECECEA"
+      },
+      "dark": {
+        "background": "#14161B",
+        "surface": "#1B1E24",
+        "border": "#2A2D34",
+        "text": "#EDEDEC",
+        "muted": "#9A9DA6",
+        "accent": "#7C9CC4",
+        "savings": "#5FB98A",
+        "warning": "#D9A64E",
+        "critical": "#E0685C",
+        "divider": "#252830"
+      }
+    },
+    "color_usage_rules": [
+      "Severity colors (warning, critical) are strictly reserved for flagged issue badges, severity indicators, and high-risk alerts.",
+      "Savings green (#2F7D5A / #5FB98A) is reserved strictly for projected/realized cost savings values, resolved statuses, and positive delta indicators.",
+      "Accent blue (#35507A / #7C9CC4) is used for active navigation tabs, interactive buttons, proxy endpoint copy highlights, and focus rings.",
+      "All numeric costs, token counts, request counts, response latency (ms), request IDs, and API endpoints must use JetBrains Mono font family."
+    ]
+  },
+  "typography": {
+    "font_family_ui": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "font_family_mono": "'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace",
+    "screen_max_type_sizes": 4,
+    "scale": {
+      "hero_savings": "text-4xl font-semibold tracking-tight font-mono",
+      "section_heading": "text-xl font-medium tracking-tight",
+      "card_title_body": "text-sm font-medium",
+      "caption_technical": "text-xs font-mono"
+    },
+    "casing": "sentence_case"
+  },
+  "layout_and_navigation": {
+    "sidebar": {
+      "style": "Left vertical collapsible sidebar",
+      "collapsible_behavior": "When collapsed, shows icon + brief text label; NEVER icon-only to maintain clarity and usability.",
+      "items": [
+        { "id": "overview", "label": "Overview", "icon": "LayoutDashboard" },
+        { "id": "issues", "label": "Issues", "icon": "AlertTriangle" },
+        { "id": "providers", "label": "Providers", "icon": "Server" },
+        { "id": "settings", "label": "Settings", "icon": "Settings" }
+      ]
+    },
+    "topbar": {
+      "components": [
+        "Proxy status pill indicator (Online / Listening on port 8000)",
+        "Currency toggle (INR ₹ / USD $)",
+        "Theme mode toggle switch (Light / Dark)",
+        "Load Synthetic Dataset action trigger button"
+      ]
+    }
+  },
+  "views_breakdown": {
+    "overview": {
+      "components": [
+        "Hero Projected Monthly Savings Card: Large projected savings number (e.g., ₹24,850/mo or $310/mo) with plain-language supporting explanation line.",
+        "Trend Line Chart: Recharts smooth line chart showing Daily Cost vs Waste Over Time across active providers with customizable date ranges.",
+        "Top 3-5 Highest-Impact Issues Card: Concise plain-language summary first, expand button for technical payload & log detail."
+      ]
+    },
+    "issues": {
+      "components": [
+        "Flat Filterable List: Filters by Provider (OpenAI, Stripe, AWS, Anthropic, DeepSeek) and Severity (Critical, Warning, Info).",
+        "Inline Expansion Rows: Expandable row showing exact HTTP endpoint, request ID, detected pattern rule, calculated waste cost, and suggested fix snippet.",
+        "Rule Tier Badges: Tier 1 Deterministic (Trustworthy), Tier 2 Threshold-based, Tier 3 Experimental (Gated, badge + confidence score)."
+      ]
+    },
+    "providers": {
+      "components": [
+        "Provider Status Cards: Connection status (Active, Inactive, Throttled), ping latency, configured token rate limits, and pricing config per model/API.",
+        "Pricing Config Modal/Drawer: Per-provider input forms to adjust token rate cost per 1M tokens or API request call cost."
+      ]
+    },
+    "settings": {
+      "components": [
+        "Detection Rule Toggles: Toggle rules across Tier 1, Tier 2, and Tier 3. Includes Tier 3 experimental gate with distinct badge + confidence threshold slider.",
+        "Window Threshold Inputs: Sliders and input fields for sliding time window (seconds), request spike multipliers, and retry backoff thresholds.",
+        "Single Visible Light/Dark Theme Switch.",
+        "Currency Switch: INR (₹) / USD ($) toggle affecting all dashboard cost displays."
+      ]
+    },
+    "empty_first_run_state": {
+      "components": [
+        "Proxy URL Banner: Clear copyable proxy endpoint snippet (`http://localhost:8000/v1/proxy`) with step-by-step developer integration instructions.",
+        "One-click 'Load Synthetic Dataset' button: Instantly populates 50+ realistic API logs, 12 waste issues across 3 tiers, and trend chart data."
+      ]
+    }
+  },
+  "detection_tiers": [
+    {
+      "tier": "Tier 1",
+      "name": "Deterministic (Trustworthy)",
+      "badge_color": "text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/50 dark:border-emerald-800",
+      "description": "Hard rules like duplicate payload requests within 2000ms, uncompressed JSON bodies > 100KB, and 4xx/5xx retries without exponential backoff."
+    },
+    {
+      "tier": "Tier 2",
+      "name": "Threshold-based Tunable",
+      "badge_color": "text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950/50 dark:border-amber-800",
+      "description": "Dynamic bounds like token consumption > 3.5x moving average, redundant polling loops, and unnecessary prompt context length."
+    },
+    {
+      "tier": "Tier 3",
+      "name": "Experimental (Gated)",
+      "badge_color": "text-purple-700 bg-purple-50 border-purple-200 dark:text-purple-400 dark:bg-purple-950/50 dark:border-purple-800",
+      "description": "Predictive semantic prompt redundancy via embedding similarity, un-cached vector queries, and high-entropy request anomalies with confidence scoring."
+    }
+  ],
+  "testing_attributes": {
+    "rule": "All interactive elements and data points MUST include data-testid attribute in kebab-case format.",
+    "examples": [
+      "data-testid='sidebar-toggle-button'",
+      "data-testid='nav-overview-link'",
+      "data-testid='nav-issues-link'",
+      "data-testid='nav-providers-link'",
+      "data-testid='nav-settings-link'",
+      "data-testid='hero-projected-savings'",
+      "data-testid='copy-proxy-url-button'",
+      "data-testid='load-synthetic-data-button'",
+      "data-testid='issue-filter-provider-select'",
+      "data-testid='issue-filter-severity-select'",
+      "data-testid='issue-row-expand-button-1'",
+      "data-testid='tier-3-experimental-toggle'",
+      "data-testid='currency-switch-button'",
+      "data-testid='theme-toggle-button'"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Ensure exact color tokens are set up in CSS variables or Tailwind classes matching user choices.",
+    "Do NOT use gradients or heavy shadows. Use flat surfaces with border-1px hairline borders (`border-[#E5E5E3]` in light mode, `border-[#2A2D34]` in dark mode).",
+    "Use JetBrains Mono for all numeric values, prices, token counts, request rates, latency numbers, and API endpoints.",
+    "Ensure sentence case across all headings, button labels, and menu items.",
+    "Maintain maximum 4 font sizes on any given screen to preserve visual hierarchy.",
+    "Ensure the sidebar when collapsed NEVER renders icon-only — keep concise labels alongside icons.",
+    "Provide a robust synthetic dataset generation handler so the dashboard can be tested immediately in empty state and full data state.",
+    "Implement currency switcher between INR (₹) and USD ($) with conversion rate calculations across all cost displays."
+  ]
+}

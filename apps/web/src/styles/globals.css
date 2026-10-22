@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/inter-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: "JetBrains Mono Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@layer base {
+  :root {
+    --background: 60 9.1% 97.8%;
+    --foreground: 225 11% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 225 11% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 225 11% 12%;
+    --primary: 216.9 39.4% 34.3%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 60 3.7% 89.4%;
+    --secondary-foreground: 225 11% 12%;
+    --muted: 60 3.7% 89.4%;
+    --muted-foreground: 220 4.9% 44.1%;
+    --accent-foreground: 0 0% 100%;
+    --ui-accent: 60 6% 95%;
+    --destructive: 6 60.5% 43.7%;
+    --destructive-foreground: 0 0% 100%;
+    --input: 60 3.7% 89.4%;
+    --ring: 216.9 39.4% 34.3%;
+    --ui-border: 60 3.7% 89.4%;
+    --ui-muted: 60 3.7% 89.4%;
+    --divider: 60 3.7% 89.4%;
+    --radius: 0.375rem;
+  }
+
+  :root[data-theme="dark"] {
+    --background: 222 14.9% 9.2%;
+    --foreground: 60 2.7% 92.7%;
+    --card: 220 14.3% 12.4%;
+    --card-foreground: 60 2.7% 92.7%;
+    --popover: 220 14.3% 12.4%;
+    --popover-foreground: 60 2.7% 92.7%;
+    --primary: 213 37.9% 62.7%;
+    --primary-foreground: 222 14.9% 9.2%;
+    --secondary: 222 10.6% 18.4%;
+    --secondary-foreground: 60 2.7% 92.7%;
+    --muted: 222 10.6% 18.4%;
+    --muted-foreground: 225 6.3% 62.7%;
+    --accent-foreground: 222 14.9% 9.2%;
+    --ui-accent: 222 12% 15.5%;
+    --destructive: 5 68% 62%;
+    --destructive-foreground: 222 14.9% 9.2%;
+    --input: 222 10.6% 18.4%;
+    --ring: 213 37.9% 62.7%;
+    --ui-border: 222 10.6% 18.4%;
+    --ui-muted: 222 10.6% 18.4%;
+    --divider: 222 10.6% 18.4%;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    background: var(--bg);
+  }
+
+  body {
+    min-width: 320px;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter Variable", Inter, sans-serif;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 0.75rem;
+  left: 0.75rem;
+  transform: translateY(-160%);
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.7rem 1rem;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.noscript-content {
+  max-width: 48rem;
+  margin: 6rem auto;
+  padding: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

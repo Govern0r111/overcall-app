@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: overcall
+      POSTGRES_USER: overcall
+      POSTGRES_PASSWORD: overcall
+    ports:
+      - "54329:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U overcall -d overcall"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - overcall-postgres:/var/lib/postgresql/data
+      - ./apps/api/tests/sql/00_auth_stub.sql:/docker-entrypoint-initdb.d/00_auth_stub.sql:ro
+      - ./supabase/migrations/20261022140000_init.sql:/docker-entrypoint-initdb.d/10_init.sql:ro
+      - ./supabase/migrations/20261022140100_rls_retention.sql:/docker-entrypoint-initdb.d/20_rls_retention.sql:ro
+
+volumes:
+  overcall-postgres:

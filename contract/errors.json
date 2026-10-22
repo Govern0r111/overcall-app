@@ -1,0 +1,90 @@
+{
+  "unauthenticated": {
+    "status":  401,
+    "message": "Sign in or provide a valid access token."
+  },
+  "invalid_token": {
+    "status":  401,
+    "message": "Your access token is invalid or expired. Sign in again."
+  },
+  "forbidden": {
+    "status":  403,
+    "message": "You do not have permission to do that."
+  },
+  "not_found": {
+    "status":  404,
+    "message": "The requested item was not found."
+  },
+  "validation_error": {
+    "status":  422,
+    "message": "Some fields are invalid."
+  },
+  "confirmation_required": {
+    "status":  400,
+    "message": "Confirm this action before continuing."
+  },
+  "real_upstream_disabled": {
+    "status":  403,
+    "message": "Real upstream access is disabled by the operator."
+  },
+  "conflict": {
+    "status":  409,
+    "message": "This action conflicts with the current state."
+  },
+  "invalid_cursor": {
+    "status":  400,
+    "message": "The pagination cursor is invalid. Refresh and try again."
+  },
+  "rate_limited": {
+    "status":  429,
+    "message": "Too many requests. Wait a moment and try again."
+  },
+  "ingest_key_missing": {
+    "status":  401,
+    "message": "Add your Overcall key in the X-Overcall-Key header."
+  },
+  "ingest_key_invalid": {
+    "status":  401,
+    "message": "This Overcall key is not valid."
+  },
+  "ingest_key_revoked": {
+    "status":  401,
+    "message": "This Overcall key has been revoked. Create a new key."
+  },
+  "stripe_live_key_rejected": {
+    "status":  403,
+    "message": "Live Stripe keys are not accepted. Use a Stripe test key."
+  },
+  "provider_not_supported": {
+    "status":  501,
+    "message": "This provider is not available yet."
+  },
+  "route_not_supported": {
+    "status":  404,
+    "message": "This proxy route is not supported."
+  },
+  "payload_too_large": {
+    "status":  413,
+    "message": "The request is larger than the configured limit."
+  },
+  "overloaded": {
+    "status":  503,
+    "message": "The service is busy. Wait a moment and try again."
+  },
+  "upstream_unreachable": {
+    "status":  502,
+    "message": "The provider could not be reached."
+  },
+  "upstream_timeout": {
+    "status":  504,
+    "message": "The provider took too long to respond."
+  },
+  "not_ready": {
+    "status":  503,
+    "message": "The service is not ready. Try again shortly."
+  },
+  "internal_error": {
+    "status":  500,
+    "message": "Something went wrong. Try again shortly."
+  }
+}

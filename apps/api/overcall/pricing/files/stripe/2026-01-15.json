@@ -1,0 +1,40 @@
+{
+  "provider": "stripe",
+  "version": "2026-01-15",
+  "effective_from": "2026-01-15T00:00:00Z",
+  "retrieved_at": "2026-10-22",
+  "source_url": "https://stripe.com/pricing",
+  "currency": "USD",
+  "models": {},
+  "default_model": null,
+  "per_request_overhead_usd": 0.0004,
+  "failed_request_overhead_usd": 0.0004,
+  "chat_endpoints": [],
+  "deterministic_post_endpoints": [],
+  "downgrade_map": {},
+  "batch_equivalents": {
+    "GET /v1/customers/{id}": {
+      "method": "GET /v1/customers (list, limit up to 100) or expand[]",
+      "discount": 0.9,
+      "basis": "Stripe does not bill per API request; this reduction applies only to Overcall's explicitly modelled operational overhead, not Stripe fees. https://stripe.com/pricing",
+      "fix": "Fetch customers in pages with the list endpoint or expand the customer on the parent object."
+    }
+  },
+  "supported": true,
+  "legacy": {
+    "upstream": {
+      "real": "https://api.stripe.com"
+    },
+    "mode": "test_only",
+    "rate_limit_per_sec": 25,
+    "money_moving_endpoints": [
+      "/v1/charges",
+      "/v1/payment_intents",
+      "/v1/refunds",
+      "/v1/transfers",
+      "/v1/payouts"
+    ],
+    "per_request_usd": 0.0004,
+    "failed_request_usd": 0.0004
+  }
+}

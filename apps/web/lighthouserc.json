@@ -1,0 +1,19 @@
+{
+  "ci": {
+    "collect": {
+      "url": ["http://127.0.0.1:4173/"],
+      "startServerCommand": "npm run preview -- --host 127.0.0.1 --port 4173",
+      "startServerReadyPattern": "http",
+      "startServerReadyTimeout": 30000,
+      "numberOfRuns": 1,
+      "settings": { "preset": "desktop" }
+    },
+    "assert": {
+      "assertions": {
+        "categories:accessibility": ["error", { "minScore": 0.9 }],
+        "categories:performance": ["error", { "minScore": 0.9 }]
+      }
+    },
+    "upload": { "target": "filesystem", "outputDir": "./.lighthouseci" }
+  }
+}

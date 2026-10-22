@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Overcall synthetic request log",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "occurred_at",
+    "provider",
+    "endpoint",
+    "method",
+    "req_size",
+    "req_hash",
+    "status",
+    "resp_size",
+    "latency_ms",
+    "ttfb_ms",
+    "cost_usd",
+    "cost_basis",
+    "pricing_version",
+    "origin",
+    "is_demo",
+    "flagged_by",
+    "caller",
+    "model",
+    "prompt_tokens",
+    "completion_tokens",
+    "tokens_estimated",
+    "stream",
+    "error_code"
+  ],
+  "properties": {
+    "id": {"type": "string", "format": "uuid"},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "provider": {"enum": ["openai", "stripe"]},
+    "endpoint": {"type": "string", "minLength": 1},
+    "method": {"enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]},
+    "req_size": {"type": "integer", "minimum": 0},
+    "req_hash": {"type": "string", "pattern": "^[a-f0-9]{16}$"},
+    "status": {"type": "integer", "minimum": 100, "maximum": 599},
+    "resp_size": {"type": "integer", "minimum": 0},
+    "latency_ms": {"type": "number", "minimum": 0},
+    "ttfb_ms": {"type": ["number", "null"], "minimum": 0},
+    "cost_usd": {"type": "number", "minimum": 0},
+    "cost_basis": {"enum": ["billed", "estimated", "modelled"]},
+    "pricing_version": {"type": "string"},
+    "origin": {"type": "string"},
+    "is_demo": {"type": "boolean"},
+    "flagged_by": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["issue_id", "rule_id", "title", "severity"],
+        "properties": {
+          "issue_id": {"type": "string", "format": "uuid"},
+          "rule_id": {"type": "string"},
+          "title": {"type": "string"},
+          "severity": {"enum": ["critical", "warning", "info"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "caller": {"type": ["string", "null"]},
+    "model": {"type": ["string", "null"]},
+    "prompt_tokens": {"type": "integer", "minimum": 0},
+    "completion_tokens": {"type": "integer", "minimum": 0},
+    "tokens_estimated": {"type": "boolean"},
+    "stream": {"type": "boolean"},
+    "error_code": {"type": ["string", "null"]}
+  }
+}

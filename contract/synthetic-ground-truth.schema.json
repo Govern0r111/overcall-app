@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Overcall synthetic ground truth",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seed", "generator_version", "labels"],
+  "properties": {
+    "seed": {"type": "integer"},
+    "generator_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["request_id", "rule_id", "role", "pattern"],
+        "properties": {
+          "request_id": {"type": "string", "format": "uuid"},
+          "rule_id": {
+            "enum": [
+              "duplicate_calls",
+              "missing_cache",
+              "retry_storm",
+              "oversized_payload",
+              "unbatched_calls",
+              "token_bloat",
+              "model_overuse"
+            ]
+          },
+          "role": {"enum": ["positive", "hard_negative"]},
+          "pattern": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}
