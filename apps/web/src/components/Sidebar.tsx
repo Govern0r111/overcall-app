@@ -5,6 +5,7 @@ import { cn } from "../lib/utils";
 import { useOverview } from "../hooks/queries";
 import { authClient } from "../auth/authClient";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const NAV = [
   { to: "/app", label: "Overview", icon: LayoutDashboard, id: "overview" },
@@ -14,11 +15,11 @@ const NAV = [
   { to: "/settings", label: "Settings", icon: Settings, id: "settings" },
 ];
 
-export const Sidebar = () => {
+export const Sidebar = ({ mobileOpen = false, onNavigate }: { mobileOpen?: boolean; onNavigate?: () => void }) => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem("cg-sidebar") === "1");
   const { data } = useOverview();
-  const openIssues = data?.has_data ? Object.values(data.issue_counts).reduce((a, b) => a + b, 0) : 0;
+  const openIssues = data?.has_data ? Object.values(data.severity_breakdown).reduce((a, b) => a + b, 0) : 0;
 
   const toggle = () => {
     localStorage.setItem("cg-sidebar", collapsed ? "0" : "1");
@@ -29,7 +30,8 @@ export const Sidebar = () => {
     <aside
       data-testid="sidebar"
       className={cn(
-        "sticky top-0 flex h-screen shrink-0 flex-col border-r border-border bg-card transition-[width] duration-200",
+        "fixed inset-y-0 left-0 z-40 h-screen shrink-0 flex-col border-r border-border bg-card transition-[width,transform] duration-200 md:sticky md:top-0 md:z-auto md:translate-x-0",
+        mobileOpen ? "flex translate-x-0" : "hidden md:flex",
         collapsed ? "w-[88px]" : "w-[232px]",
       )}
     >
@@ -50,6 +52,7 @@ export const Sidebar = () => {
             key={to}
             to={to}
             end={to === "/"}
+            onClick={onNavigate}
             data-testid={`nav-${id}-link`}
             className={({ isActive }) =>
               cn(
@@ -94,16 +97,26 @@ export const Sidebar = () => {
         ))}
       </nav>
       <div className="border-t border-divider p-3">
-        {!collapsed && (
-          <button
-            type="button"
-            onClick={async () => { await authClient.logout(); navigate("/login", { replace: true }); }}
-            className="mb-1 flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-          >
-            <LogOut className="h-4 w-4" strokeWidth={1.75} />
-            <span>Log out</span>
-          </button>
-        )}
+        <button
+          type="button"
+          aria-label="Log out"
+          title={collapsed ? "Log out" : undefined}
+          onClick={async () => {
+            try {
+              await authClient.logout();
+              navigate("/login", { replace: true });
+            } catch (error) {
+              toast.error(error instanceof Error ? error.message : "Could not log out.");
+            }
+          }}
+          className={cn(
+            "mb-1 flex w-full items-center rounded-md py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground",
+            collapsed ? "justify-center" : "gap-3 px-3",
+          )}
+        >
+          <LogOut className="h-4 w-4" strokeWidth={1.75} />
+          {!collapsed && <span>Log out</span>}
+        </button>
         <button
           type="button"
           onClick={toggle}

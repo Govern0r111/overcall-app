@@ -14,7 +14,7 @@ from ..pricing.cost import estimate_cost
 from .scenarios import inject_scenarios
 from .truth import GroundTruth, GroundTruthLabel
 
-GENERATOR_VERSION = "1.0.0"
+GENERATOR_VERSION = "1.1.0"
 _NAMESPACE = uuid.NAMESPACE_URL
 _DAYS_SECONDS = 86_400
 _SMALL_BASELINE_PER_WEEK = 160
@@ -67,7 +67,6 @@ class LogRow(BaseModel):
         record = self.model_dump(mode="python")
         record.update(
             {
-                "_id": self.id,
                 "timestamp": self.occurred_at,
                 "source": self.source,
                 "context_hash": self.context_hash,
@@ -130,14 +129,10 @@ class SyntheticGenerator:
     ) -> LogRow:
         request_index = len(self.logs)
         request_id = str(uuid.uuid5(_NAMESPACE, f"{self.seed}:{request_index}"))
-        request_hash = req_hash or h or self.hash_for(
-            f"request:{self.seed}:{request_index}"
-        )
+        request_hash = req_hash or h or self.hash_for(f"request:{self.seed}:{request_index}")
         if req_size is None:
             req_size = (
-                prompt_tokens * 4 + 220
-                if provider == "openai"
-                else self.rng.randint(60, 400)
+                prompt_tokens * 4 + 220 if provider == "openai" else self.rng.randint(60, 400)
             )
         if resp_size is None:
             resp_size = (

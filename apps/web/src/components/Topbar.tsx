@@ -1,13 +1,15 @@
-import { Loader2, Moon, Sun, Database, Wifi } from "lucide-react";
+import { Loader2, Database, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { useApp } from "../context/AppContext";
-import { useOverview, useLoadSynthetic } from "../hooks/queries";
+import { useLoadDemo, useMe } from "../hooks/queries";
 import { Currency } from "../lib/api";
 import { useSaveSettings } from "../hooks/queries";
 import { cn } from "../lib/utils";
+import { ThemeToggle as ThemePreferenceToggle } from "./ThemeToggle";
+import { BACKEND_URL } from "../lib/api";
 
 const CurrencyToggle = () => {
-  const { settings, money } = useApp();
+  const { settings } = useApp();
   const save = useSaveSettings();
   if (!settings) return null;
   const active = settings.currency;
@@ -32,51 +34,57 @@ const CurrencyToggle = () => {
   );
 };
 
-const ThemeToggle = () => {
-  const { theme, setTheme } = useApp();
-  return (
-    <button
-      type="button"
-      data-testid="theme-toggle-button"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      aria-label="Toggle theme"
-      className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
-    >
-      {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-    </button>
-  );
-};
-
 const ProxyStatus = () => {
-  const { data } = useOverview();
-  const hasData = data?.has_data;
+  const { data, error, isLoading } = useMe();
+  const labels: Record<string, string> = {
+    no_key: "No ingest key",
+    waiting_for_traffic: "Waiting for traffic",
+    receiving_traffic: "Receiving traffic",
+    demo_only: "Demo data only",
+  };
+  const status = error ? "API unavailable" : isLoading ? "Checking API" : labels[data?.proxy_status ?? ""] ?? "Proxy status unknown";
+  const dotColor = error
+    ? "bg-destructive"
+    : data?.proxy_status === "receiving_traffic"
+      ? "bg-savings"
+      : data?.proxy_status === "demo_only"
+        ? "bg-amber-500"
+        : "bg-muted-foreground";
+  const apiPort = new URL(BACKEND_URL).port;
   return (
     <div
       data-testid="topbar-proxy-status"
       className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-xs"
     >
-      <span className="relative flex h-2 w-2">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-savings opacity-60" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-savings" />
-      </span>
-      <span className="hidden text-muted-foreground sm:inline">Proxy online</span>
-      <span className="hidden font-mono text-muted-foreground sm:inline">:8000</span>
-      {hasData === false && <span className="hidden font-mono text-muted-foreground md:inline">· listening</span>}
+      <span className={cn("inline-flex h-2 w-2 rounded-full", dotColor)} />
+      <span className="hidden text-muted-foreground sm:inline">{status}</span>
+      {apiPort && <span className="hidden font-mono text-muted-foreground sm:inline">:{apiPort}</span>}
     </div>
   );
 };
 
-export const Topbar = () => {
-  const load = useLoadSynthetic();
+export const Topbar = ({ onMenuClick, menuOpen = false }: { onMenuClick?: () => void; menuOpen?: boolean }) => {
+  const load = useLoadDemo();
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-border bg-background/80 px-6 backdrop-blur-md lg:px-8">
-      <ProxyStatus />
+      <div className="flex min-w-0 items-center gap-2">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+          aria-expanded={menuOpen}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-card text-muted-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary md:hidden"
+        >
+          <Menu className="h-4 w-4" />
+        </button>
+        <ProxyStatus />
+      </div>
       <div className="flex items-center gap-2.5">
         <Button
           size="sm"
           variant="outline"
           data-testid="topbar-load-synthetic-button"
-          onClick={() => load.mutate(42)}
+          onClick={() => load.mutate()}
           disabled={load.isPending}
           className="h-8 gap-1.5 text-xs"
         >
@@ -84,7 +92,7 @@ export const Topbar = () => {
           {load.isPending ? "Loading…" : "Load demo data"}
         </Button>
         <CurrencyToggle />
-        <ThemeToggle />
+        <ThemePreferenceToggle />
       </div>
     </header>
   );

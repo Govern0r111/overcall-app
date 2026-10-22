@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from overcall.db.models import SQLModel
 
+PUBLIC_SCHEMAS = (None, "public")
+
 
 def _test_database_url() -> str:
     value = os.getenv("TEST_DATABASE_URL")
@@ -33,12 +35,12 @@ def test_postgres_schema_matches_sqlmodel_tables() -> None:
                     assert set(inspector.get_table_names(schema="public")) == {
                         table_name
                         for table_name, table in SQLModel.metadata.tables.items()
-                        if table.schema == "public"
+                        if table.schema in PUBLIC_SCHEMAS
                     }
                     return {
                         table_name: inspector.get_columns(table_name, schema="public")
                         for table_name, table in SQLModel.metadata.tables.items()
-                        if table.schema == "public"
+                        if table.schema in PUBLIC_SCHEMAS
                     }
 
                 return await connection.run_sync(read_schema)
@@ -49,12 +51,13 @@ def test_postgres_schema_matches_sqlmodel_tables() -> None:
     expected_tables = {
         table_name
         for table_name, table in SQLModel.metadata.tables.items()
-        if table.schema == "public"
+        if table.schema in PUBLIC_SCHEMAS
     }
+    assert expected_tables, "no public tables were discovered"
     assert set(actual) == expected_tables
 
     for table_name, table in SQLModel.metadata.tables.items():
-        if table.schema != "public":
+        if table.schema not in PUBLIC_SCHEMAS:
             continue
         actual_columns = {column["name"]: column for column in actual[table_name]}
         assert set(actual_columns) == set(table.columns.keys()), table_name
@@ -66,12 +69,14 @@ def test_postgres_schema_matches_sqlmodel_tables() -> None:
             assert observed["type"]._type_affinity is column.type._type_affinity, (
                 f"{table_name}.{column_name} type: {observed['type']} != {column.type}"
             )
-            if isinstance(column.type, Numeric):
+            if isinstance(column.type, Numeric) and not isinstance(column.type, Float):
                 assert observed["type"].precision == column.type.precision
                 assert observed["type"].scale == column.type.scale
             if isinstance(column.type, DateTime):
                 assert observed["type"].timezone == column.type.timezone
-            if isinstance(column.type, Float):
+            if isinstance(column.type, Float) and column.type.precision == 24:
+                assert type(observed["type"]).__name__ == "REAL"
+            elif isinstance(column.type, Float):
                 assert observed["type"].precision == column.type.precision
 
 
@@ -80,8 +85,9 @@ def test_rls_is_enabled_without_data_api_policies_or_grants() -> None:
     expected_tables = [
         table_name
         for table_name, table in SQLModel.metadata.tables.items()
-        if table.schema == "public"
+        if table.schema in PUBLIC_SCHEMAS
     ]
+    assert expected_tables, "no public tables were discovered"
 
     async def check_security() -> None:
         engine = create_async_engine(url, connect_args={"statement_cache_size": 0})

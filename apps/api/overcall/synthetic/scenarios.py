@@ -139,9 +139,7 @@ def inject_scenarios(generator, repeat: int) -> None:
             600,
             100,
             h=h,
-            labels=[
-                _label(missing_cache, "hard_negative", "non_deterministic_chat_repeat")
-            ],
+            labels=[_label(missing_cache, "hard_negative", "non_deterministic_chat_repeat")],
         )
 
         h = generator.hash_for(f"embedding-cache-{index}")
@@ -152,9 +150,7 @@ def inject_scenarios(generator, repeat: int) -> None:
                 h=h,
                 caller="search-api",
                 labels=(
-                    [_label(missing_cache, "positive", "repeated_embedding")]
-                    if attempt
-                    else None
+                    [_label(missing_cache, "positive", "repeated_embedding")] if attempt else None
                 ),
             )
 
@@ -190,9 +186,7 @@ def inject_scenarios(generator, repeat: int) -> None:
                 status=200 if attempt == 3 else 429,
                 h=h,
                 labels=(
-                    [_label(retry, "hard_negative", "exponential_backoff")]
-                    if attempt
-                    else None
+                    [_label(retry, "hard_negative", "exponential_backoff")] if attempt else None
                 ),
             )
 
@@ -239,9 +233,7 @@ def inject_scenarios(generator, repeat: int) -> None:
             "GET",
             "/v1/events",
             resp_size=200_000,
-            labels=[
-                _label(oversized, "hard_negative", "payload_exactly_at_threshold")
-            ],
+            labels=[_label(oversized, "hard_negative", "payload_exactly_at_threshold")],
         )
         generator.log(
             ts,
@@ -271,9 +263,7 @@ def inject_scenarios(generator, repeat: int) -> None:
                 80,
                 caller=f"four-call-burst-{index}",
                 labels=(
-                    [_label(unbatched, "hard_negative", "four_call_burst")]
-                    if attempt
-                    else None
+                    [_label(unbatched, "hard_negative", "four_call_burst")] if attempt else None
                 ),
             )
         for attempt in range(5):
@@ -298,9 +288,7 @@ def inject_scenarios(generator, repeat: int) -> None:
                 ctx=context,
                 context_tokens=1_200,
                 labels=(
-                    [_label(token_bloat, "positive", "repeated_system_prompt")]
-                    if attempt
-                    else None
+                    [_label(token_bloat, "positive", "repeated_system_prompt")] if attempt else None
                 ),
             )
         below_minimum_context = generator.hash_for(f"small-context-{index}")
@@ -381,6 +369,98 @@ def inject_scenarios(generator, repeat: int) -> None:
                     if attempt == 0
                     else None
                 ),
+            )
+
+        # User-reviewed positives outside the current rules' exact-match thresholds.
+        first_hash = generator.hash_for(f"semantic-duplicate-first-{index}")
+        generator.chat(ts, "gpt-4o-mini", 500, 80, h=first_hash)
+        generator.chat(
+            ts + timedelta(seconds=2),
+            "gpt-4o-mini",
+            500,
+            80,
+            h=generator.hash_for(f"semantic-duplicate-next-{index}"),
+            labels=[
+                _label(
+                    duplicate,
+                    "positive",
+                    "semantic_duplicate_nonsemantic_metadata",
+                )
+            ],
+        )
+
+        late_embedding_hash = generator.hash_for(f"duplicate-after-window-{index}")
+        generator.embed(ts, 100, h=late_embedding_hash)
+        generator.embed(
+            ts + timedelta(seconds=601),
+            100,
+            h=late_embedding_hash,
+            labels=[
+                _label(
+                    missing_cache,
+                    "positive",
+                    "duplicate_after_configured_window",
+                )
+            ],
+        )
+
+        overlap_hash = generator.hash_for(f"overlapping-page-first-{index}")
+        generator.log(
+            ts,
+            "stripe",
+            "GET",
+            "/v1/events",
+            h=overlap_hash,
+            caller="event-dashboard",
+        )
+        generator.log(
+            ts + timedelta(seconds=30),
+            "stripe",
+            "GET",
+            "/v1/events",
+            h=generator.hash_for(f"overlapping-page-next-{index}"),
+            caller="event-dashboard",
+            labels=[
+                _label(
+                    missing_cache,
+                    "positive",
+                    "overlapping_poll_different_cursor",
+                )
+            ],
+        )
+
+        backoff_hash = generator.hash_for(f"long-backoff-retries-{index}")
+        for attempt in range(4):
+            generator.chat(
+                ts + timedelta(seconds=attempt * 1.2),
+                "gpt-4o-mini",
+                600,
+                120,
+                status=429,
+                h=backoff_hash,
+                caller="completion-worker",
+                labels=(
+                    [_label(retry, "positive", "retry_chain_beyond_fast_threshold")]
+                    if attempt
+                    else None
+                ),
+            )
+
+        for attempt in range(10):
+            generator.chat(
+                ts + timedelta(seconds=attempt * 2),
+                "gpt-4o",
+                900,
+                100,
+                h=generator.hash_for(f"premium-medium-task-{index}-{attempt}"),
+                caller="medium-task-worker",
+                labels=[
+                    _label(
+                        model_overuse,
+                        "positive",
+                        "premium_model_above_tiny_task_threshold",
+                    )
+                ],
             )
         for attempt in range(10):
             generator.chat(

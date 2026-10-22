@@ -30,7 +30,9 @@ class UnbatchedCalls(Rule):
         w = ctx.w
         candidates = [l for l in logs if batch_for(l)]
         found, meta = [], {}
-        for key, group in group_by(candidates, lambda l: (l.provider, l.method, l.endpoint, l.caller)).items():
+        for key, group in group_by(
+            candidates, lambda l: (l.provider, l.method, l.endpoint, l.caller)
+        ).items():
             for b in bursts(group, w.unbatched_window_s, w.unbatched_min_calls):
                 found += b[1:]
                 m = meta.setdefault((key[0], key[2]), {"bursts": 0, "largest": 0, "callers": set()})
@@ -42,17 +44,24 @@ class UnbatchedCalls(Rule):
             batch = batch_for(items[0])
             waste = {l.id: l.cost_usd * batch["discount"] for l in items}
             m, label = meta[(prov, ep)], PROVIDER_LABEL.get(prov, prov)
-            findings.append(Finding(
-                issue_type=self.id,
-                severity=severity_for(ctx.monthly(sum(waste.values())), critical_at=30.0, warning_at=1.0),
-                provider=prov, endpoint=ep,
-                title=f"Many single {label} calls that could be batched",
-                summary=f"Your app made {len(items)} one-at-a-time calls to {ep} in quick bursts. {label} offers a batch option that does the same work in fewer, cheaper requests.",
-                explanation=(
-                    f"Bursts of ≥{w.unbatched_min_calls} calls with ≤{w.unbatched_window_s:g}s between them "
-                    f"({m['bursts']} bursts, largest {m['largest']} calls; caller: {', '.join(sorted(m['callers']))}). "
-                    f"Documented batch equivalent: {batch['method']}."
-                ),
-                suggested_fix=batch["fix"], affected=items, waste_by_request=waste,
-            ))
+            findings.append(
+                Finding(
+                    issue_type=self.id,
+                    severity=severity_for(
+                        ctx.monthly(sum(waste.values())), critical_at=30.0, warning_at=1.0
+                    ),
+                    provider=prov,
+                    endpoint=ep,
+                    title=f"Many single {label} calls that could be batched",
+                    summary=f"Your app made {len(items)} one-at-a-time calls to {ep} in quick bursts. {label} offers a batch option that does the same work in fewer, cheaper requests.",
+                    explanation=(
+                        f"Bursts of ≥{w.unbatched_min_calls} calls with ≤{w.unbatched_window_s:g}s between them "
+                        f"({m['bursts']} bursts, largest {m['largest']} calls; caller: {', '.join(sorted(m['callers']))}). "
+                        f"Documented batch equivalent: {batch['method']}."
+                    ),
+                    suggested_fix=batch["fix"],
+                    affected=items,
+                    waste_by_request=waste,
+                )
+            )
         return findings

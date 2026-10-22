@@ -9,7 +9,7 @@ database.
 1. Start the disposable PostgreSQL 15 database from the repository root:
    `docker compose -f docker-compose.dev.yml up -d postgres`.
 2. Copy `.env.example` to `.env` and set local-only values.
-3. Install development dependencies with `python -m pip install -r requirements-dev.txt`.
+3. Install the API and development dependencies with `python -m pip install -e . -r requirements-dev.txt`.
 4. From `apps/api`, run `uvicorn overcall.main:app --reload`.
 5. `GET /healthz` is database-independent. `GET /readyz` checks the database.
 
@@ -20,12 +20,11 @@ enabled.
 
 ## Tests
 
-Run `pytest` from this directory. CI runs Ruff on the B1/B2 implementation and
-tests; some carried-over prototype modules still need cleanup during their
-planned migration.
-Schema-parity integration tests require the local Postgres database and a
-`TEST_DATABASE_URL`; the CI job initializes a fresh database and applies the
-tracked migrations before running tests.
+Run `pytest` from this directory. CI runs Ruff and the API unit/security tests.
+PostgreSQL integration tests, including ingest-key lifecycle and tenant isolation,
+require a local Postgres database and `TEST_DATABASE_URL`.
+The CI job initializes a fresh database and applies the tracked migrations
+before running tests.
 
 Provider pricing is versioned in `overcall/pricing/files`. Prices are stored in
 USD and include a retrieval date and source URL. Run

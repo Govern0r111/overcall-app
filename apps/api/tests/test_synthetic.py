@@ -89,7 +89,8 @@ def test_persistable_log_record_does_not_include_ground_truth():
     record = logs[0].to_record()
 
     assert record["source"] == "demo"
-    assert record["id"] == record["_id"]
+    assert record["id"] == logs[0].id
+    assert "_id" not in record
     assert not {
         "ground_truth",
         "label",
@@ -123,7 +124,21 @@ def test_every_rule_has_positive_and_hard_negative_scenarios():
         "repeated_system_prompt",
         "premium_model_for_tiny_task",
         "model_overuse_boundary_800_tokens",
+        "semantic_duplicate_nonsemantic_metadata",
+        "duplicate_after_configured_window",
+        "overlapping_poll_different_cursor",
+        "retry_chain_beyond_fast_threshold",
+        "premium_model_above_tiny_task_threshold",
     } <= patterns
+    assert {
+        "semantic_duplicate_nonsemantic_metadata",
+        "duplicate_after_configured_window",
+        "overlapping_poll_different_cursor",
+        "retry_chain_beyond_fast_threshold",
+        "premium_model_above_tiny_task_threshold",
+    } <= {
+        label.pattern for label in truth.labels if label.role == "positive"
+    }
 
 
 def test_baseline_traffic_is_clean_for_every_rule():

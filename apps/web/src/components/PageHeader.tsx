@@ -17,5 +17,5 @@ export const PageHeader = ({ title, description, actions }: Props) => (
 );
 
 export const Card = ({ children, className = "", testId }: { children: ReactNode; className?: string; testId?: string }) => (
-  <section data-testid={testId} className={`rounded-lg border border-border bg-card ${className}`}>{children}</section>
+  <section data-testid={testId} className={`min-w-0 rounded-lg border border-border bg-card ${className}`}>{children}</section>
 );

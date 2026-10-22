@@ -1,0 +1,42 @@
+{
+  "dataset": "synthetic",
+  "generator_version": "1.1.0",
+  "note": "Regression baseline for the user-reviewed synthetic fixture v1.1.0. The accepted adversarial positives expose expected misses; these scores are not evidence of real-traffic accuracy.",
+  "rules": [
+    {
+      "rule_id": "duplicate_calls",
+      "precision": 1.0,
+      "recall": 0.8
+    },
+    {
+      "rule_id": "missing_cache",
+      "precision": 1.0,
+      "recall": 0.75
+    },
+    {
+      "rule_id": "retry_storm",
+      "precision": 1.0,
+      "recall": 0.5
+    },
+    {
+      "rule_id": "oversized_payload",
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    {
+      "rule_id": "unbatched_calls",
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    {
+      "rule_id": "token_bloat",
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    {
+      "rule_id": "model_overuse",
+      "precision": 1.0,
+      "recall": 0.5
+    }
+  ]
+}

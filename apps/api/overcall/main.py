@@ -6,13 +6,17 @@ from uuid import uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from starlette.responses import Response
 
+from .api.routers import health_router, v1_router
+from .auth.jwt import SupabaseJWTVerifier
 from .config import Settings, get_settings
 from .db.engine import create_database_engine
-from .errors import OvercallError, register_error_handlers, unhandled_error_handler
+from .errors import register_error_handlers, unhandled_error_handler
 from .logging import configure_logging, get_logger, reset_request_id, set_request_id
+from .proxy.router import router as proxy_router
+from .proxy.wiring import build_proxy_state
 
 logger = get_logger(__name__)
 
@@ -44,11 +48,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app: FastAPI):
         configure_logging(app_settings.log_level)
         app.state.engine = create_database_engine(app_settings)
+        app.state.session_factory = (
+            async_sessionmaker(app.state.engine, expire_on_commit=False)
+            if app.state.engine is not None
+            else None
+        )
+        app.state.proxy = None
+        if app.state.session_factory is not None:
+            app.state.proxy = build_proxy_state(app_settings, app.state.session_factory)
+            app.state.proxy.writer.start()
         try:
             yield
         finally:
+            if app.state.proxy is not None:
+                await app.state.proxy.writer.stop()
+                await app.state.proxy.aclose()
             if app.state.engine is not None:
                 await app.state.engine.dispose()
+            await app.state.jwt_verifier.aclose()
 
     app = FastAPI(
         title="Overcall API",
@@ -56,7 +73,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = app_settings
+    app.state.jwt_verifier = SupabaseJWTVerifier(app_settings)
     app.state.engine = None
+    app.state.session_factory = None
     register_error_handlers(app)
     app.add_middleware(VersionedCorsMiddleware, settings=app_settings)
 
@@ -84,24 +103,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         finally:
             reset_request_id(token)
 
-    @app.get("/healthz", include_in_schema=True)
-    async def health() -> dict[str, str]:
-        return {"status": "ok", "release": app_settings.release}
-
-    @app.get("/readyz", include_in_schema=True)
-    async def readiness(request: Request) -> dict[str, str]:
-        engine = request.app.state.engine
-        if engine is None:
-            raise OvercallError("not_ready", 503, "The service is not ready. Try again shortly.")
-        try:
-            async with engine.connect() as connection:
-                await connection.execute(text("select 1"))
-        except Exception as exc:
-            logger.warning("Database readiness check failed: %s", type(exc).__name__)
-            raise OvercallError(
-                "not_ready", 503, "The service is not ready. Try again shortly."
-            ) from exc
-        return {"status": "ok"}
+    app.include_router(health_router)
+    app.include_router(v1_router)
+    app.include_router(proxy_router)
 
     return app
 

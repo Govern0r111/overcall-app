@@ -10,7 +10,11 @@ def find_chains(group, backoff_ms, min_attempts):
     chains, i = [], 0
     while i < len(group):
         chain, j = [group[i]], i
-        while j + 1 < len(group) and not is_ok(group[j].status) and gap_s(group[j], group[j + 1]) * 1000 < backoff_ms:
+        while (
+            j + 1 < len(group)
+            and not is_ok(group[j].status)
+            and gap_s(group[j], group[j + 1]) * 1000 < backoff_ms
+        ):
             chain.append(group[j + 1])
             j += 1
         if len(chain) >= min_attempts:
@@ -36,21 +40,34 @@ class RetryStorm(Rule):
             waste = {l.id: l.cost_usd for l in items}
             codes = sorted({str(l.status) for c in ch for l in c if not is_ok(l.status)})
             n = len(items)
-            sev = "critical" if n >= 30 else max(
-                "warning", severity_for(ctx.monthly(sum(waste.values()))), key=["info", "warning", "critical"].index
+            sev = (
+                "critical"
+                if n >= 30
+                else max(
+                    "warning",
+                    severity_for(ctx.monthly(sum(waste.values()))),
+                    key=["info", "warning", "critical"].index,
+                )
             )
-            findings.append(Finding(
-                issue_type=self.id, severity=sev, provider=prov, endpoint=ep,
-                title=f"Rapid retries after {PROVIDER_LABEL.get(prov, prov)} errors",
-                summary=(
-                    f"When {ep} failed, your app retried {n} times with almost no pause ({len(ch)} bursts). "
-                    "This hammers the rate limit and usually makes the outage last longer."
-                ),
-                explanation=(
-                    f"Chains of ≥{w.retry_min_attempts} attempts with identical payload hash where each retry followed a non-2xx "
-                    f"response in < {w.retry_min_backoff_ms:g}ms. Status codes seen: {', '.join(codes)}. "
-                    f"Longest chain: {max(len(c) for c in ch)} attempts."
-                ),
-                suggested_fix=FIX, affected=items, waste_by_request=waste,
-            ))
+            findings.append(
+                Finding(
+                    issue_type=self.id,
+                    severity=sev,
+                    provider=prov,
+                    endpoint=ep,
+                    title=f"Rapid retries after {PROVIDER_LABEL.get(prov, prov)} errors",
+                    summary=(
+                        f"When {ep} failed, your app retried {n} times with almost no pause ({len(ch)} bursts). "
+                        "This hammers the rate limit and usually makes the outage last longer."
+                    ),
+                    explanation=(
+                        f"Chains of ≥{w.retry_min_attempts} attempts with identical payload hash where each retry followed a non-2xx "
+                        f"response in < {w.retry_min_backoff_ms:g}ms. Status codes seen: {', '.join(codes)}. "
+                        f"Longest chain: {max(len(c) for c in ch)} attempts."
+                    ),
+                    suggested_fix=FIX,
+                    affected=items,
+                    waste_by_request=waste,
+                )
+            )
         return findings

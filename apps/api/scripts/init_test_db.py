@@ -24,8 +24,15 @@ async def initialize() -> None:
     try:
         async with connection.transaction():
             await connection.execute((API_ROOT / "tests" / "sql" / "00_auth_stub.sql").read_text())
+            has_pgcrypto = await connection.fetchval(
+                "select exists (select 1 from pg_available_extensions where name = 'pgcrypto')"
+            )
             for migration in sorted(MIGRATIONS.glob("20261022*.sql")):
-                await connection.execute(migration.read_text(encoding="utf-8"))
+                sql = migration.read_text(encoding="utf-8")
+                if not has_pgcrypto:
+                    # Embedded builds lack pgcrypto; gen_random_uuid() is built in on PG13+.
+                    sql = sql.replace("create extension if not exists pgcrypto;", "")
+                await connection.execute(sql)
     finally:
         await connection.close()
 

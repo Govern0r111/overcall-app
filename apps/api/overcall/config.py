@@ -23,10 +23,13 @@ class Settings(BaseSettings):
     db_pool_size: int = 5
     db_max_overflow: int = 5
     supabase_url: str | None = None
+    supabase_jwt_algorithms: str = "RS256,ES256"
     supabase_jwt_secret: SecretStr | None = None
+    supabase_jwt_leeway_seconds: int = 30
     supabase_service_role_key: SecretStr | None = None
     ingest_key_pepper: SecretStr | None = None
     ingest_key_pepper_prev: SecretStr | None = None
+    ingest_key_pepper_version: int = 1
     internal_token: SecretStr | None = None
     cors_origins: str = "http://localhost:5173"
     public_proxy_base_url: str = "http://localhost:8000"
@@ -61,6 +64,30 @@ class Settings(BaseSettings):
             raise ValueError("must not be negative")
         return value
 
+    @field_validator("supabase_jwt_leeway_seconds")
+    @classmethod
+    def validate_jwt_leeway(cls, value: int) -> int:
+        if not 0 <= value <= 120:
+            raise ValueError("must be between 0 and 120 seconds")
+        return value
+
+    @field_validator("supabase_jwt_algorithms")
+    @classmethod
+    def validate_jwt_algorithms(cls, value: str) -> str:
+        algorithms = [item.strip() for item in value.split(",")]
+        if not algorithms or any(not item for item in algorithms):
+            raise ValueError("must be a comma-separated list of supported JWT algorithms")
+        if len(set(algorithms)) != len(algorithms) or not set(algorithms) <= {"RS256", "ES256"}:
+            raise ValueError("only RS256 and ES256 are supported for Supabase JWKS signing keys")
+        return ",".join(algorithms)
+
+    @field_validator("ingest_key_pepper_version")
+    @classmethod
+    def validate_pepper_version(cls, value: int) -> int:
+        if not 1 <= value <= 32_767:
+            raise ValueError("must be between 1 and 32767")
+        return value
+
     @field_validator(
         "max_request_body_bytes",
         "max_response_buffer_bytes",
@@ -84,7 +111,12 @@ class Settings(BaseSettings):
             raise ValueError("must be between 1 and 90 days")
         return value
 
-    @field_validator("ingest_key_pepper", "ingest_key_pepper_prev", "internal_token")
+    @field_validator(
+        "ingest_key_pepper",
+        "ingest_key_pepper_prev",
+        "internal_token",
+        "supabase_jwt_secret",
+    )
     @classmethod
     def validate_secret_length(cls, value: SecretStr | None) -> SecretStr | None:
         if value is not None and len(value.get_secret_value()) < 32:
@@ -108,10 +140,15 @@ class Settings(BaseSettings):
         return ",".join(origins)
 
     @field_validator(
-        "openai_upstream_base_url", "stripe_upstream_base_url", "public_proxy_base_url"
+        "openai_upstream_base_url",
+        "stripe_upstream_base_url",
+        "public_proxy_base_url",
+        "supabase_url",
     )
     @classmethod
-    def validate_http_url(cls, value: str) -> str:
+    def validate_http_url(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
         if not value.startswith(("https://", "http://")):
             raise ValueError("must be an HTTP or HTTPS URL")
         return value.rstrip("/")
@@ -124,6 +161,8 @@ class Settings(BaseSettings):
                 missing.append("DATABASE_URL")
             if self.supabase_url is None:
                 missing.append("SUPABASE_URL")
+            elif not self.supabase_url.startswith("https://"):
+                raise ValueError("Production SUPABASE_URL must use HTTPS")
             if self.ingest_key_pepper is None:
                 missing.append("INGEST_KEY_PEPPER")
             if self.internal_token is None:
@@ -143,6 +182,17 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin for origin in self.cors_origins.split(",") if origin]
+
+    @property
+    def supabase_jwks_algorithms(self) -> tuple[str, ...]:
+        return tuple(self.supabase_jwt_algorithms.split(","))
+
+    @property
+    def allowed_supabase_jwt_algorithms(self) -> tuple[str, ...]:
+        algorithms = self.supabase_jwks_algorithms
+        if self.supabase_jwt_secret is not None:
+            return (*algorithms, "HS256")
+        return algorithms
 
     @property
     def database_ssl(self) -> bool:

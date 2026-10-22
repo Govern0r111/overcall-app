@@ -1,5 +1,5 @@
 {
-  "generator_version": "1.0.0",
+  "generator_version": "1.1.0",
   "labels": [
     {
       "pattern": "no_backoff_retries",
@@ -10,6 +10,24 @@
     {
       "pattern": "retry_storm_minimum_attempts",
       "request_id": "0182ed1a-1a9a-58a1-8b4c-6e70316223e6",
+      "role": "positive",
+      "rule_id": "retry_storm"
+    },
+    {
+      "pattern": "premium_model_with_tools",
+      "request_id": "01dfeee7-7152-58e7-b434-1c3de3f25bd4",
+      "role": "hard_negative",
+      "rule_id": "model_overuse"
+    },
+    {
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "02c73e9d-7c55-5604-ad9d-5749cbb99470",
+      "role": "positive",
+      "rule_id": "model_overuse"
+    },
+    {
+      "pattern": "retry_chain_beyond_fast_threshold",
+      "request_id": "049af35d-cd3c-5965-be05-85ea973da849",
       "role": "positive",
       "rule_id": "retry_storm"
     },
@@ -38,10 +56,40 @@
       "rule_id": "model_overuse"
     },
     {
+      "pattern": "semantic_duplicate_nonsemantic_metadata",
+      "request_id": "0d85fd09-1f7a-5ac3-b82b-188400ed1101",
+      "role": "positive",
+      "rule_id": "duplicate_calls"
+    },
+    {
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "0e220b1a-92be-5932-a71c-d0acf81efc9c",
+      "role": "positive",
+      "rule_id": "model_overuse"
+    },
+    {
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "1083dd7c-1663-502c-93bf-3e7991ebac72",
+      "role": "positive",
+      "rule_id": "model_overuse"
+    },
+    {
       "pattern": "loop_of_single_embeddings",
       "request_id": "1573c2e8-5e6e-5d47-b8e8-7f82cd4dc0ba",
       "role": "positive",
       "rule_id": "unbatched_calls"
+    },
+    {
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "2356f179-bd5f-570d-a30e-e385ea63989f",
+      "role": "positive",
+      "rule_id": "model_overuse"
+    },
+    {
+      "pattern": "duplicate_after_configured_window",
+      "request_id": "240bc1e8-698b-55a6-b8ec-597ba0dc0e6f",
+      "role": "positive",
+      "rule_id": "missing_cache"
     },
     {
       "pattern": "model_overuse_boundary_800_tokens",
@@ -60,6 +108,12 @@
       "request_id": "2c1a3469-362d-559b-a3d4-13292729b119",
       "role": "positive",
       "rule_id": "duplicate_calls"
+    },
+    {
+      "pattern": "retry_chain_beyond_fast_threshold",
+      "request_id": "371e99a0-eeea-5bab-b42a-2697630de8dd",
+      "role": "positive",
+      "rule_id": "retry_storm"
     },
     {
       "pattern": "page_refresh_storm",
@@ -170,6 +224,12 @@
       "rule_id": "model_overuse"
     },
     {
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "56b28d44-41aa-5f8c-aa23-d6013634506c",
+      "role": "positive",
+      "rule_id": "model_overuse"
+    },
+    {
       "pattern": "loop_of_single_embeddings",
       "request_id": "56d1e2cf-c7f9-5e8b-898b-8042c6427e6b",
       "role": "positive",
@@ -212,6 +272,12 @@
       "rule_id": "model_overuse"
     },
     {
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "6e2886a2-db9f-5e29-8c4e-a98eb6e5701a",
+      "role": "positive",
+      "rule_id": "model_overuse"
+    },
+    {
       "pattern": "no_backoff_retries",
       "request_id": "7e835553-3c03-509e-88f9-252f24157083",
       "role": "positive",
@@ -234,6 +300,12 @@
       "request_id": "8c0998e9-5270-567d-b882-d9c7b0628f50",
       "role": "positive",
       "rule_id": "model_overuse"
+    },
+    {
+      "pattern": "overlapping_poll_different_cursor",
+      "request_id": "8c9dc8fc-dfb9-5704-af12-534d030c0b70",
+      "role": "positive",
+      "rule_id": "missing_cache"
     },
     {
       "pattern": "model_overuse_boundary_800_tokens",
@@ -272,9 +344,15 @@
       "rule_id": "oversized_payload"
     },
     {
-      "pattern": "premium_model_with_tools",
-      "request_id": "b8510f01-2752-5a10-b49b-7a4c23b80b08",
-      "role": "hard_negative",
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "b3e8390e-4ee7-5169-b794-1f0bf1af63e0",
+      "role": "positive",
+      "rule_id": "model_overuse"
+    },
+    {
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "b4d0cec4-93ed-5258-96c0-6a0530aa1006",
+      "role": "positive",
       "rule_id": "model_overuse"
     },
     {
@@ -344,6 +422,12 @@
       "rule_id": "token_bloat"
     },
     {
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "d8351481-6d6d-5bdf-b7db-964b115be9b6",
+      "role": "positive",
+      "rule_id": "model_overuse"
+    },
+    {
       "pattern": "exponential_backoff",
       "request_id": "dc26c96e-a6dc-544b-9840-509e2d209b37",
       "role": "hard_negative",
@@ -404,6 +488,12 @@
       "rule_id": "unbatched_calls"
     },
     {
+      "pattern": "premium_model_above_tiny_task_threshold",
+      "request_id": "f784dd54-213d-54de-b6b3-caba5cb10496",
+      "role": "positive",
+      "rule_id": "model_overuse"
+    },
+    {
       "pattern": "different_payloads_rapidly",
       "request_id": "f8bf4ec9-0526-5957-8e36-edb06fc69e1a",
       "role": "hard_negative",
@@ -414,6 +504,12 @@
       "request_id": "fa9d3b36-1d29-5486-9545-d9af504d782e",
       "role": "positive",
       "rule_id": "token_bloat"
+    },
+    {
+      "pattern": "retry_chain_beyond_fast_threshold",
+      "request_id": "fafd8ff5-820c-5183-a4c4-56f2c2d6eda6",
+      "role": "positive",
+      "rule_id": "retry_storm"
     },
     {
       "pattern": "loop_of_single_embeddings",

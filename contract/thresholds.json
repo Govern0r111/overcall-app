@@ -1,0 +1,83 @@
+{
+  "version": "1.0.0",
+  "cross_field_rules": [
+    {
+      "fields": ["long_window_s", "short_window_s"],
+      "rule": "long_window_s must be greater than short_window_s"
+    }
+  ],
+  "thresholds": {
+    "short_window_s": {
+      "default": 10,
+      "min": 1,
+      "max": 300,
+      "used_by": ["duplicate_calls", "missing_cache"]
+    },
+    "long_window_s": {
+      "default": 600,
+      "min": 60,
+      "max": 3600,
+      "used_by": ["missing_cache"]
+    },
+    "retry_min_backoff_ms": {
+      "default": 1000,
+      "min": 100,
+      "max": 10000,
+      "used_by": ["retry_storm"]
+    },
+    "retry_min_attempts": {
+      "default": 3,
+      "min": 2,
+      "max": 10,
+      "used_by": ["retry_storm"]
+    },
+    "oversized_bytes": {
+      "default": 200000,
+      "min": 10000,
+      "max": 5000000,
+      "used_by": ["oversized_payload"]
+    },
+    "unbatched_min_calls": {
+      "default": 5,
+      "min": 2,
+      "max": 100,
+      "used_by": ["unbatched_calls"]
+    },
+    "unbatched_window_s": {
+      "default": 5,
+      "min": 1,
+      "max": 60,
+      "used_by": ["unbatched_calls"]
+    },
+    "token_bloat_min_repeats": {
+      "default": 3,
+      "min": 2,
+      "max": 50,
+      "used_by": ["token_bloat"]
+    },
+    "token_bloat_min_context_tokens": {
+      "default": 1024,
+      "min": 256,
+      "max": 32000,
+      "used_by": ["token_bloat"]
+    },
+    "model_overuse_max_prompt_tokens": {
+      "default": 800,
+      "min": 50,
+      "max": 8000,
+      "used_by": ["model_overuse"]
+    },
+    "model_overuse_max_completion_tokens": {
+      "default": 300,
+      "min": 10,
+      "max": 4000,
+      "used_by": ["model_overuse"]
+    },
+    "model_overuse_min_calls": {
+      "default": 10,
+      "min": 3,
+      "max": 1000,
+      "used_by": ["model_overuse"]
+    }
+  }
+}

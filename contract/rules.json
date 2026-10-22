@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "duplicate_calls",
+      "name": "Duplicate calls",
+      "tier": 1,
+      "description": "The same provider, method, and request hash repeated within the short window after a successful response.",
+      "default_enabled": true,
+      "threshold_keys": ["short_window_s"]
+    },
+    {
+      "id": "missing_cache",
+      "name": "Missing cache",
+      "tier": 1,
+      "description": "An identical GET or documented deterministic POST repeated after the short window and within the long window following a successful response.",
+      "default_enabled": true,
+      "threshold_keys": ["short_window_s", "long_window_s"]
+    },
+    {
+      "id": "retry_storm",
+      "name": "Retry storms",
+      "tier": 1,
+      "description": "Identical calls retried too quickly after non-success responses, forming a chain of multiple attempts.",
+      "default_enabled": true,
+      "threshold_keys": ["retry_min_backoff_ms", "retry_min_attempts"]
+    },
+    {
+      "id": "oversized_payload",
+      "name": "Oversized payloads",
+      "tier": 2,
+      "description": "Requests or responses larger than the configured size limit, which usually means more data is being sent or fetched than needed.",
+      "default_enabled": true,
+      "threshold_keys": ["oversized_bytes"]
+    },
+    {
+      "id": "unbatched_calls",
+      "name": "Unbatched calls",
+      "tier": 2,
+      "description": "Bursts of separate calls to an endpoint that has a documented batch alternative.",
+      "default_enabled": true,
+      "threshold_keys": ["unbatched_min_calls", "unbatched_window_s"]
+    },
+    {
+      "id": "token_bloat",
+      "name": "Token bloat",
+      "tier": 3,
+      "description": "The same long conversation context sent again and again at full input price. Experimental.",
+      "default_enabled": false,
+      "threshold_keys": ["token_bloat_min_repeats", "token_bloat_min_context_tokens"]
+    },
+    {
+      "id": "model_overuse",
+      "name": "Model overuse",
+      "tier": 3,
+      "description": "A premium model used for small tasks where its cheaper sibling may do. Experimental.",
+      "default_enabled": false,
+      "threshold_keys": ["model_overuse_max_prompt_tokens", "model_overuse_max_completion_tokens", "model_overuse_min_calls"]
+    }
+  ]
+}

@@ -12,7 +12,9 @@ SCAN_ROOTS = (
 )
 FORBIDDEN = re.compile(
     r"(?i)(?:pymongo|motor|emergentintegrations|from\s+supabase|import\s+supabase|"
-    r"from_mongo|to_mongo|costguard|x-costguard)"
+    r"from_mongo|to_mongo|costguard|x-costguard|"
+    r"\.(?:find_one|find|insert_many|insert_one|delete_many|replace_one|aggregate|"
+    r"count_documents)\s*\()"
 )
 
 

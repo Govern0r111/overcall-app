@@ -47,3 +47,24 @@ def test_remote_database_requires_ssl_but_local_development_does_not() -> None:
 
     assert local.database_ssl is False
     assert remote.database_ssl is True
+
+
+def test_jwt_algorithms_come_from_configuration_and_reject_unsupported_values() -> None:
+    asymmetric = Settings(
+        app_env="test",
+        supabase_jwt_algorithms="ES256",
+    )
+    legacy = Settings(
+        app_env="test",
+        supabase_jwt_algorithms="RS256,ES256",
+        supabase_jwt_secret=SecretStr("s" * 40),
+    )
+    assert asymmetric.allowed_supabase_jwt_algorithms == ("ES256",)
+    assert legacy.allowed_supabase_jwt_algorithms == ("RS256", "ES256", "HS256")
+
+    try:
+        Settings(app_env="test", supabase_jwt_algorithms="none")
+    except ValidationError as exc:
+        assert "only RS256 and ES256" in str(exc)
+    else:
+        raise AssertionError("Unsupported JWT algorithm was accepted")

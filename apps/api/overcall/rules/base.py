@@ -43,8 +43,7 @@ class Rule(ABC):
     description: str
 
     @abstractmethod
-    def detect(self, logs: List[RequestLog], ctx: RuleContext) -> List[Finding]:
-        ...
+    def detect(self, logs: List[RequestLog], ctx: RuleContext) -> List[Finding]: ...
 
 
 def gap_s(a: RequestLog, b: RequestLog) -> float:

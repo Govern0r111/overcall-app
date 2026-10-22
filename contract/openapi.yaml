@@ -1,0 +1,1781 @@
+openapi: 3.1.0
+info:
+  title: Overcall API
+  version: local
+paths:
+  /healthz:
+    get:
+      summary: Health
+      operationId: health_healthz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+                title: Response Health Healthz Get
+  /readyz:
+    get:
+      summary: Readiness
+      operationId: readiness_readyz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+                title: Response Readiness Readyz Get
+  /v1/me:
+    get:
+      tags:
+      - account
+      summary: Get Me
+      operationId: get_me_v1_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+  /v1/overview:
+    get:
+      tags:
+      - overview
+      summary: Get Overview
+      operationId: get_overview_v1_overview_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Overview'
+  /v1/issues:
+    get:
+      tags:
+      - issues
+      summary: List Issues
+      operationId: list_issues_v1_issues_get
+      parameters:
+      - name: provider
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - openai
+            - stripe
+            - aws
+            type: string
+          - type: 'null'
+          title: Provider
+      - name: severity
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - critical
+            - warning
+            - info
+            type: string
+          - type: 'null'
+          title: Severity
+      - name: tier
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - 1
+            - 2
+            - 3
+            type: integer
+          - type: 'null'
+          title: Tier
+      - name: impact_kind
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - spend
+            - reliability
+            type: string
+          - type: 'null'
+          title: Impact Kind
+      - name: include_experimental
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Include Experimental
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 50
+          title: Limit
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_Issue_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/issues/{issue_id}:
+    get:
+      tags:
+      - issues
+      summary: Get Issue
+      operationId: get_issue_v1_issues__issue_id__get
+      parameters:
+      - name: issue_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Issue Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueDetail'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/logs:
+    get:
+      tags:
+      - logs
+      summary: List Logs
+      operationId: list_logs_v1_logs_get
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 200
+          - type: 'null'
+          title: Q
+      - name: provider
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - openai
+            - stripe
+            - aws
+            type: string
+          - type: 'null'
+          title: Provider
+      - name: status_class
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - 2xx
+            - 3xx
+            - 4xx
+            - 5xx
+            type: string
+          - type: 'null'
+          title: Status Class
+      - name: endpoint
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 300
+          - type: 'null'
+          title: Endpoint
+      - name: caller
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 64
+          - type: 'null'
+          title: Caller
+      - name: model
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Model
+      - name: issue_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Issue Id
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: To
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 50
+          title: Limit
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page_LogEntry_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/logs/facets:
+    get:
+      tags:
+      - logs
+      summary: Log Facets
+      operationId: log_facets_v1_logs_facets_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogFacets'
+  /v1/logs/{log_id}:
+    get:
+      tags:
+      - logs
+      summary: Get Log
+      operationId: get_log_v1_logs__log_id__get
+      parameters:
+      - name: log_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Log Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogEntry'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/providers:
+    get:
+      tags:
+      - providers
+      summary: List Providers
+      operationId: list_providers_v1_providers_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Provider'
+                type: array
+                title: Response List Providers V1 Providers Get
+  /v1/settings:
+    get:
+      tags:
+      - settings
+      summary: Get Settings
+      operationId: get_settings_v1_settings_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsOut'
+    put:
+      tags:
+      - settings
+      summary: Put Settings
+      operationId: put_settings_v1_settings_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingsIn'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/settings/reset:
+    post:
+      tags:
+      - settings
+      summary: Reset Settings
+      operationId: reset_settings_v1_settings_reset_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - additionalProperties: true
+                type: object
+              - type: 'null'
+              title: Body
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/rules:
+    get:
+      tags:
+      - rules
+      summary: List Rules
+      operationId: list_rules_v1_rules_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RuleInfo'
+                type: array
+                title: Response List Rules V1 Rules Get
+  /v1/detection/run:
+    post:
+      tags:
+      - detection
+      summary: Start Run
+      operationId: start_run_v1_detection_run_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunSummary'
+  /v1/detection/runs/latest:
+    get:
+      tags:
+      - detection
+      summary: Latest Run
+      operationId: latest_run_v1_detection_runs_latest_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunSummary'
+  /v1/demo/load:
+    post:
+      tags:
+      - demo
+      summary: Load Demo
+      operationId: load_demo_v1_demo_load_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DemoLoadIn'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DemoLoadOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/demo:
+    delete:
+      tags:
+      - demo
+      summary: Delete Demo
+      operationId: delete_demo_v1_demo_delete
+      responses:
+        '204':
+          description: Successful Response
+  /v1/data:
+    delete:
+      tags:
+      - data
+      summary: Delete All Data
+      operationId: delete_all_data_v1_data_delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+              - additionalProperties: true
+                type: object
+              - type: 'null'
+              title: Body
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/accuracy:
+    get:
+      tags:
+      - accuracy
+      summary: Get Accuracy
+      operationId: get_accuracy_v1_accuracy_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accuracy'
+components:
+  schemas:
+    Accuracy:
+      properties:
+        datasets:
+          items:
+            $ref: '#/components/schemas/AccuracyDataset'
+          type: array
+          title: Datasets
+      additionalProperties: false
+      type: object
+      required:
+      - datasets
+      title: Accuracy
+    AccuracyDataset:
+      properties:
+        id:
+          type: string
+          enum:
+          - synthetic
+          - real
+          title: Id
+        label:
+          type: string
+          title: Label
+        note:
+          type: string
+          title: Note
+        generated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Generated At
+        requests:
+          type: integer
+          title: Requests
+        rules:
+          items:
+            $ref: '#/components/schemas/AccuracyRule'
+          type: array
+          title: Rules
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - label
+      - note
+      - generated_at
+      - requests
+      - rules
+      title: AccuracyDataset
+    AccuracyRule:
+      properties:
+        rule_id:
+          type: string
+          title: Rule Id
+        tier:
+          type: integer
+          title: Tier
+        positives:
+          type: integer
+          title: Positives
+        flagged:
+          type: integer
+          title: Flagged
+        true_positives:
+          type: integer
+          title: True Positives
+        precision:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Precision
+        recall:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Recall
+        false_positives_on_hard_negatives:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: False Positives On Hard Negatives
+        wilson_low:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Wilson Low
+        wilson_high:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Wilson High
+      additionalProperties: false
+      type: object
+      required:
+      - rule_id
+      - tier
+      - positives
+      - flagged
+      - true_positives
+      - precision
+      - recall
+      title: AccuracyRule
+    DemoLoadIn:
+      properties:
+        seed:
+          type: integer
+          maximum: 2147483647.0
+          minimum: 0.0
+          title: Seed
+          default: 42
+        days:
+          type: integer
+          maximum: 30.0
+          minimum: 1.0
+          title: Days
+          default: 7
+      additionalProperties: false
+      type: object
+      title: DemoLoadIn
+    DemoLoadOut:
+      properties:
+        inserted:
+          type: integer
+          title: Inserted
+      additionalProperties: false
+      type: object
+      required:
+      - inserted
+      title: DemoLoadOut
+    ExperimentalSavings:
+      properties:
+        projected_monthly_usd:
+          type: number
+          title: Projected Monthly Usd
+      additionalProperties: false
+      type: object
+      required:
+      - projected_monthly_usd
+      title: ExperimentalSavings
+    FacetValue:
+      properties:
+        value:
+          type: string
+          title: Value
+        count:
+          type: integer
+          title: Count
+      additionalProperties: false
+      type: object
+      required:
+      - value
+      - count
+      title: FacetValue
+    FlaggedBy:
+      properties:
+        issue_id:
+          type: string
+          format: uuid
+          title: Issue Id
+        rule_id:
+          type: string
+          title: Rule Id
+        title:
+          type: string
+          title: Title
+        severity:
+          type: string
+          enum:
+          - critical
+          - warning
+          - info
+          title: Severity
+      additionalProperties: false
+      type: object
+      required:
+      - issue_id
+      - rule_id
+      - title
+      - severity
+      title: FlaggedBy
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    Issue:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        rule_id:
+          type: string
+          title: Rule Id
+        rule_name:
+          type: string
+          title: Rule Name
+        tier:
+          type: integer
+          enum:
+          - 1
+          - 2
+          - 3
+          title: Tier
+        experimental:
+          type: boolean
+          title: Experimental
+        provider:
+          type: string
+          enum:
+          - openai
+          - stripe
+          - aws
+          title: Provider
+        endpoint:
+          type: string
+          title: Endpoint
+        severity:
+          type: string
+          enum:
+          - critical
+          - warning
+          - info
+          title: Severity
+        impact_kind:
+          type: string
+          enum:
+          - spend
+          - reliability
+          title: Impact Kind
+        title:
+          type: string
+          title: Title
+        summary:
+          type: string
+          title: Summary
+        explanation:
+          type: string
+          title: Explanation
+        suggested_fix:
+          type: string
+          title: Suggested Fix
+        affected_count:
+          type: integer
+          title: Affected Count
+        window_savings_usd:
+          type: number
+          title: Window Savings Usd
+        projected_monthly_usd:
+          type: number
+          title: Projected Monthly Usd
+        confidence:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Confidence
+        is_demo_data:
+          type: boolean
+          title: Is Demo Data
+        detected_at:
+          type: string
+          format: date-time
+          title: Detected At
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - rule_id
+      - rule_name
+      - tier
+      - experimental
+      - provider
+      - endpoint
+      - severity
+      - impact_kind
+      - title
+      - summary
+      - explanation
+      - suggested_fix
+      - affected_count
+      - window_savings_usd
+      - projected_monthly_usd
+      - confidence
+      - is_demo_data
+      - detected_at
+      title: Issue
+    IssueDetail:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        rule_id:
+          type: string
+          title: Rule Id
+        rule_name:
+          type: string
+          title: Rule Name
+        tier:
+          type: integer
+          enum:
+          - 1
+          - 2
+          - 3
+          title: Tier
+        experimental:
+          type: boolean
+          title: Experimental
+        provider:
+          type: string
+          enum:
+          - openai
+          - stripe
+          - aws
+          title: Provider
+        endpoint:
+          type: string
+          title: Endpoint
+        severity:
+          type: string
+          enum:
+          - critical
+          - warning
+          - info
+          title: Severity
+        impact_kind:
+          type: string
+          enum:
+          - spend
+          - reliability
+          title: Impact Kind
+        title:
+          type: string
+          title: Title
+        summary:
+          type: string
+          title: Summary
+        explanation:
+          type: string
+          title: Explanation
+        suggested_fix:
+          type: string
+          title: Suggested Fix
+        affected_count:
+          type: integer
+          title: Affected Count
+        window_savings_usd:
+          type: number
+          title: Window Savings Usd
+        projected_monthly_usd:
+          type: number
+          title: Projected Monthly Usd
+        confidence:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Confidence
+        is_demo_data:
+          type: boolean
+          title: Is Demo Data
+        detected_at:
+          type: string
+          format: date-time
+          title: Detected At
+        sample_requests:
+          items:
+            $ref: '#/components/schemas/SampleRequest'
+          type: array
+          title: Sample Requests
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - rule_id
+      - rule_name
+      - tier
+      - experimental
+      - provider
+      - endpoint
+      - severity
+      - impact_kind
+      - title
+      - summary
+      - explanation
+      - suggested_fix
+      - affected_count
+      - window_savings_usd
+      - projected_monthly_usd
+      - confidence
+      - is_demo_data
+      - detected_at
+      - sample_requests
+      title: IssueDetail
+    LogEntry:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        occurred_at:
+          type: string
+          format: date-time
+          title: Occurred At
+        provider:
+          type: string
+          enum:
+          - openai
+          - stripe
+          - aws
+          title: Provider
+        method:
+          type: string
+          title: Method
+        endpoint:
+          type: string
+          title: Endpoint
+        status:
+          type: integer
+          title: Status
+        latency_ms:
+          type: number
+          title: Latency Ms
+        ttfb_ms:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Ttfb Ms
+        req_size:
+          type: integer
+          title: Req Size
+        resp_size:
+          type: integer
+          title: Resp Size
+        req_hash:
+          type: string
+          title: Req Hash
+        model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Model
+        prompt_tokens:
+          type: integer
+          title: Prompt Tokens
+        completion_tokens:
+          type: integer
+          title: Completion Tokens
+        tokens_estimated:
+          type: boolean
+          title: Tokens Estimated
+        stream:
+          type: boolean
+          title: Stream
+        cost_usd:
+          type: number
+          title: Cost Usd
+        cost_basis:
+          type: string
+          enum:
+          - billed
+          - estimated
+          - modelled
+          title: Cost Basis
+        pricing_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pricing Version
+        caller:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Caller
+        has_idempotency_key:
+          type: boolean
+          title: Has Idempotency Key
+        error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Code
+        origin:
+          type: string
+          enum:
+          - upstream
+          - overcall
+          title: Origin
+        is_demo:
+          type: boolean
+          title: Is Demo
+        flagged_by:
+          items:
+            $ref: '#/components/schemas/FlaggedBy'
+          type: array
+          title: Flagged By
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - occurred_at
+      - provider
+      - method
+      - endpoint
+      - status
+      - latency_ms
+      - ttfb_ms
+      - req_size
+      - resp_size
+      - req_hash
+      - model
+      - prompt_tokens
+      - completion_tokens
+      - tokens_estimated
+      - stream
+      - cost_usd
+      - cost_basis
+      - pricing_version
+      - caller
+      - has_idempotency_key
+      - error_code
+      - origin
+      - is_demo
+      - flagged_by
+      title: LogEntry
+    LogFacets:
+      properties:
+        providers:
+          items:
+            $ref: '#/components/schemas/FacetValue'
+          type: array
+          title: Providers
+        endpoints:
+          items:
+            $ref: '#/components/schemas/FacetValue'
+          type: array
+          title: Endpoints
+        callers:
+          items:
+            $ref: '#/components/schemas/FacetValue'
+          type: array
+          title: Callers
+        models:
+          items:
+            $ref: '#/components/schemas/FacetValue'
+          type: array
+          title: Models
+      additionalProperties: false
+      type: object
+      required:
+      - providers
+      - endpoints
+      - callers
+      - models
+      title: LogFacets
+    Me:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        proxy_status:
+          type: string
+          enum:
+          - no_key
+          - waiting_for_traffic
+          - receiving_traffic
+          - demo_only
+          title: Proxy Status
+        last_request_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Request At
+        issue_count:
+          type: integer
+          title: Issue Count
+        is_demo_data:
+          type: boolean
+          title: Is Demo Data
+        has_data:
+          type: boolean
+          title: Has Data
+        real_upstream_available:
+          type: boolean
+          title: Real Upstream Available
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - email
+      - created_at
+      - proxy_status
+      - last_request_at
+      - issue_count
+      - is_demo_data
+      - has_data
+      - real_upstream_available
+      title: Me
+    Overview:
+      properties:
+        has_data:
+          type: boolean
+          title: Has Data
+        is_demo_data:
+          type: boolean
+          title: Is Demo Data
+        generated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Generated At
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        window:
+          $ref: '#/components/schemas/OverviewWindow'
+        request_count:
+          type: integer
+          title: Request Count
+        flagged_request_count:
+          type: integer
+          title: Flagged Request Count
+        total_spend_usd:
+          type: number
+          title: Total Spend Usd
+        spend_savings:
+          $ref: '#/components/schemas/SpendSavings'
+        experimental_spend_savings:
+          $ref: '#/components/schemas/ExperimentalSavings'
+        reliability_findings:
+          $ref: '#/components/schemas/ReliabilityFindings'
+        severity_breakdown:
+          $ref: '#/components/schemas/SeverityBreakdown'
+        by_provider:
+          items:
+            $ref: '#/components/schemas/ProviderBreakdown'
+          type: array
+          title: By Provider
+        trend:
+          items:
+            $ref: '#/components/schemas/TrendPoint'
+          type: array
+          title: Trend
+        top_issues:
+          items:
+            $ref: '#/components/schemas/Issue'
+          type: array
+          title: Top Issues
+      additionalProperties: false
+      type: object
+      required:
+      - has_data
+      - is_demo_data
+      - generated_at
+      - run_id
+      - window
+      - request_count
+      - flagged_request_count
+      - total_spend_usd
+      - spend_savings
+      - experimental_spend_savings
+      - reliability_findings
+      - severity_breakdown
+      - by_provider
+      - trend
+      - top_issues
+      title: Overview
+    OverviewWindow:
+      properties:
+        start:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Start
+        end:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: End
+        days:
+          type: number
+          title: Days
+        low_confidence_projection:
+          type: boolean
+          title: Low Confidence Projection
+      additionalProperties: false
+      type: object
+      required:
+      - start
+      - end
+      - days
+      - low_confidence_projection
+      title: OverviewWindow
+    Page_Issue_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Issue'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      additionalProperties: false
+      type: object
+      required:
+      - items
+      title: Page[Issue]
+    Page_LogEntry_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/LogEntry'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      additionalProperties: false
+      type: object
+      required:
+      - items
+      title: Page[LogEntry]
+    PricingRow:
+      properties:
+        label:
+          type: string
+          title: Label
+        usd_per_1m:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Usd Per 1M
+        usd_per_request:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Usd Per Request
+      additionalProperties: false
+      type: object
+      required:
+      - label
+      title: PricingRow
+    Provider:
+      properties:
+        id:
+          type: string
+          enum:
+          - openai
+          - stripe
+          - aws
+          title: Id
+        name:
+          type: string
+          title: Name
+        status:
+          type: string
+          enum:
+          - waiting
+          - receiving_traffic
+          - demo_only
+          - coming_soon
+          title: Status
+        proxy_base_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Proxy Base Url
+        snippets:
+          items:
+            $ref: '#/components/schemas/Snippet'
+          type: array
+          title: Snippets
+        traffic:
+          $ref: '#/components/schemas/ProviderTraffic'
+        upstream_mode:
+          anyOf:
+          - type: string
+            enum:
+            - mock
+            - real
+            - test
+          - type: 'null'
+          title: Upstream Mode
+        pricing:
+          anyOf:
+          - $ref: '#/components/schemas/ProviderPricing'
+          - type: 'null'
+        notes:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Notes
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - name
+      - status
+      - proxy_base_url
+      - snippets
+      - traffic
+      - upstream_mode
+      - pricing
+      - notes
+      title: Provider
+    ProviderBreakdown:
+      properties:
+        provider:
+          type: string
+          enum:
+          - openai
+          - stripe
+          - aws
+          title: Provider
+        spend_usd:
+          type: number
+          title: Spend Usd
+        issue_count:
+          type: integer
+          title: Issue Count
+      additionalProperties: false
+      type: object
+      required:
+      - provider
+      - spend_usd
+      - issue_count
+      title: ProviderBreakdown
+    ProviderPricing:
+      properties:
+        version:
+          type: string
+          title: Version
+        effective_from:
+          type: string
+          format: date-time
+          title: Effective From
+        source_url:
+          type: string
+          title: Source Url
+        rows:
+          items:
+            $ref: '#/components/schemas/PricingRow'
+          type: array
+          title: Rows
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - effective_from
+      - source_url
+      - rows
+      title: ProviderPricing
+    ProviderTraffic:
+      properties:
+        proxy:
+          type: integer
+          title: Proxy
+        demo:
+          type: integer
+          title: Demo
+        last_request_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Request At
+      additionalProperties: false
+      type: object
+      required:
+      - proxy
+      - demo
+      - last_request_at
+      title: ProviderTraffic
+    ReliabilityFindings:
+      properties:
+        count:
+          type: integer
+          title: Count
+        modelled_overhead_monthly_usd:
+          type: number
+          title: Modelled Overhead Monthly Usd
+      additionalProperties: false
+      type: object
+      required:
+      - count
+      - modelled_overhead_monthly_usd
+      title: ReliabilityFindings
+    RuleInfo:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+        tier:
+          type: integer
+          enum:
+          - 1
+          - 2
+          - 3
+          title: Tier
+        description:
+          type: string
+          title: Description
+        default_enabled:
+          type: boolean
+          title: Default Enabled
+        threshold_keys:
+          items:
+            type: string
+          type: array
+          title: Threshold Keys
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - name
+      - tier
+      - description
+      - default_enabled
+      - threshold_keys
+      title: RuleInfo
+    RunSummary:
+      properties:
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        status:
+          type: string
+          enum:
+          - running
+          - succeeded
+          - failed
+          - none
+          title: Status
+        started_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Started At
+        finished_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Finished At
+        request_count:
+          type: integer
+          title: Request Count
+          default: 0
+        issue_counts:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Issue Counts
+        rule_errors:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Rule Errors
+        duration_ms:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Duration Ms
+      additionalProperties: false
+      type: object
+      required:
+      - run_id
+      - status
+      title: RunSummary
+    SampleRequest:
+      properties:
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        occurred_at:
+          type: string
+          format: date-time
+          title: Occurred At
+        req_hash:
+          type: string
+          title: Req Hash
+        req_size:
+          type: integer
+          title: Req Size
+        resp_size:
+          type: integer
+          title: Resp Size
+        status:
+          type: integer
+          title: Status
+        cost_usd:
+          type: number
+          title: Cost Usd
+      additionalProperties: false
+      type: object
+      required:
+      - request_id
+      - occurred_at
+      - req_hash
+      - req_size
+      - resp_size
+      - status
+      - cost_usd
+      title: SampleRequest
+    SettingsIn:
+      properties:
+        currency:
+          type: string
+          enum:
+          - INR
+          - USD
+          title: Currency
+        usd_inr_rate:
+          type: number
+          maximum: 10000.0
+          exclusiveMinimum: 0.0
+          title: Usd Inr Rate
+        rules_enabled:
+          additionalProperties:
+            type: boolean
+          type: object
+          title: Rules Enabled
+        tier3_enabled:
+          type: boolean
+          title: Tier3 Enabled
+        thresholds:
+          additionalProperties: true
+          type: object
+          title: Thresholds
+        upstream_mode:
+          type: string
+          enum:
+          - mock
+          - real
+          title: Upstream Mode
+        confirm_real_upstream:
+          type: boolean
+          title: Confirm Real Upstream
+          default: false
+        retention_days:
+          type: integer
+          maximum: 90.0
+          minimum: 1.0
+          title: Retention Days
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+      additionalProperties: false
+      type: object
+      required:
+      - currency
+      - usd_inr_rate
+      - rules_enabled
+      - tier3_enabled
+      - thresholds
+      - upstream_mode
+      - retention_days
+      title: SettingsIn
+    SettingsOut:
+      properties:
+        currency:
+          type: string
+          enum:
+          - INR
+          - USD
+          title: Currency
+        usd_inr_rate:
+          type: number
+          title: Usd Inr Rate
+        rules_enabled:
+          additionalProperties:
+            type: boolean
+          type: object
+          title: Rules Enabled
+        tier3_enabled:
+          type: boolean
+          title: Tier3 Enabled
+        thresholds:
+          additionalProperties:
+            type: number
+          type: object
+          title: Thresholds
+        upstream_mode:
+          type: string
+          enum:
+          - mock
+          - real
+          title: Upstream Mode
+        confirm_real_upstream:
+          type: boolean
+          title: Confirm Real Upstream
+          default: false
+        retention_days:
+          type: integer
+          title: Retention Days
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      additionalProperties: false
+      type: object
+      required:
+      - currency
+      - usd_inr_rate
+      - rules_enabled
+      - tier3_enabled
+      - thresholds
+      - upstream_mode
+      - retention_days
+      - updated_at
+      title: SettingsOut
+    SeverityBreakdown:
+      properties:
+        critical:
+          type: integer
+          title: Critical
+          default: 0
+        warning:
+          type: integer
+          title: Warning
+          default: 0
+        info:
+          type: integer
+          title: Info
+          default: 0
+      additionalProperties: false
+      type: object
+      title: SeverityBreakdown
+    Snippet:
+      properties:
+        id:
+          type: string
+          title: Id
+        label:
+          type: string
+          title: Label
+        code:
+          type: string
+          title: Code
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - label
+      - code
+      title: Snippet
+    SpendSavings:
+      properties:
+        window_usd:
+          type: number
+          title: Window Usd
+        projected_monthly_usd:
+          type: number
+          title: Projected Monthly Usd
+        percent_of_spend:
+          type: number
+          title: Percent Of Spend
+      additionalProperties: false
+      type: object
+      required:
+      - window_usd
+      - projected_monthly_usd
+      - percent_of_spend
+      title: SpendSavings
+    TrendPoint:
+      properties:
+        date:
+          type: string
+          title: Date
+        spend_usd:
+          type: number
+          title: Spend Usd
+        waste_usd:
+          type: number
+          title: Waste Usd
+      additionalProperties: false
+      type: object
+      required:
+      - date
+      - spend_usd
+      - waste_usd
+      title: TrendPoint
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError

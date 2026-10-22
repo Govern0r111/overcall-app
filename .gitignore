@@ -100,4 +100,5 @@ credentials.json
 *.key
 .credentials
 validation/samples/
+supabase/.temp/
 dist/

@@ -29,17 +29,23 @@ class OversizedPayload(Rule):
                 summary = f"{n} requests to {ep} sent far more text than usual (up to {max(sizes):.0f} KB). You're billed for every token, even the ones the model doesn't need."
             else:
                 summary = f"{n} responses from {ep} returned up to {max(sizes):.0f} KB each. Fetching less per page is faster and cheaper to process."
-            findings.append(Finding(
-                issue_type=self.id,
-                severity=severity_for(ctx.monthly(sum(waste.values())), critical_at=30.0, warning_at=1.0),
-                provider=prov, endpoint=ep,
-                title=f"Very large {PROVIDER_LABEL.get(prov, prov)} payloads",
-                summary=summary,
-                explanation=(
-                    f"Request or response body exceeded the {limit / 1000:.0f} KB threshold (tunable in Settings). "
-                    f"Median size {statistics.median(sizes):.0f} KB. Savings assume trimming each payload down to the threshold."
-                ),
-                suggested_fix=FIXES.get(prov, FIXES["stripe"]),
-                affected=items, waste_by_request=waste,
-            ))
+            findings.append(
+                Finding(
+                    issue_type=self.id,
+                    severity=severity_for(
+                        ctx.monthly(sum(waste.values())), critical_at=30.0, warning_at=1.0
+                    ),
+                    provider=prov,
+                    endpoint=ep,
+                    title=f"Very large {PROVIDER_LABEL.get(prov, prov)} payloads",
+                    summary=summary,
+                    explanation=(
+                        f"Request or response body exceeded the {limit / 1000:.0f} KB threshold (tunable in Settings). "
+                        f"Median size {statistics.median(sizes):.0f} KB. Savings assume trimming each payload down to the threshold."
+                    ),
+                    suggested_fix=FIXES.get(prov, FIXES["stripe"]),
+                    affected=items,
+                    waste_by_request=waste,
+                )
+            )
         return findings

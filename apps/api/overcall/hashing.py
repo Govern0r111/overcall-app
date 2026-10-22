@@ -40,6 +40,8 @@ def context_hash(messages) -> str | None:
     if not isinstance(messages, list):
         return None
     system = "".join(
-        str(m.get("content", "")) for m in messages if isinstance(m, dict) and m.get("role") in ("system", "developer")
+        str(m.get("content", ""))
+        for m in messages
+        if isinstance(m, dict) and m.get("role") in ("system", "developer")
     )
     return sha(system) if len(system) >= 200 else None

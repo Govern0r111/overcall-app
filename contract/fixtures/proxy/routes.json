@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "ingest_header": "X-Overcall-Key",
+  "caller_header": "X-Overcall-Caller",
+  "key_placeholder": "YOUR_OVERCALL_KEY",
+  "routes": [
+    {
+      "provider": "openai",
+      "prefix": "/proxy/openai/v1",
+      "forwards_to": "/v1",
+      "status": "supported"
+    },
+    {
+      "provider": "stripe",
+      "prefix": "/proxy/stripe/v1",
+      "forwards_to": "/v1",
+      "status": "supported"
+    },
+    {
+      "provider": "aws",
+      "prefix": "/proxy/aws",
+      "forwards_to": null,
+      "status": "not_supported"
+    }
+  ]
+}

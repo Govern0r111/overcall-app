@@ -7,27 +7,21 @@ from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class BaseDocument(BaseModel):
+class RecordModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    id: str = Field(default_factory=lambda: str(uuid4()), alias="_id")
+    id: str = Field(default_factory=lambda: str(uuid4()))
 
     @classmethod
-    def from_record(cls, doc: dict | None) -> BaseDocument | None:
+    def from_record(cls, doc: dict | None) -> RecordModel | None:
         if not doc:
             return None
-        if "_id" in doc and "id" not in doc:
-            doc = {**doc, "id": str(doc["_id"])}
         return cls.model_validate(doc)
 
-    from_mongo = from_record
-
     def to_record(self) -> dict:
-        return self.model_dump(by_alias=True)
-
-    to_mongo = to_record
+        return self.model_dump()
 
 
-class RequestLog(BaseDocument):
+class RequestLog(RecordModel):
     timestamp: datetime
     provider: str
     endpoint: str
@@ -58,7 +52,7 @@ class RequestLog(BaseDocument):
     error_code: str | None = None
 
 
-class Issue(BaseDocument):
+class Issue(RecordModel):
     rule_id: str
     rule_name: str
     issue_type: str

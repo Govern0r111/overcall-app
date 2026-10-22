@@ -47,7 +47,8 @@ jobs:
           cache-dependency-path: apps/api/requirements-dev.txt
       - run: python -m pip install -r requirements-dev.txt
       - run: python scripts/init_test_db.py
-      - run: ruff check overcall/config.py overcall/deps.py overcall/errors.py overcall/logging.py overcall/main.py overcall/db overcall/pricing overcall/pricing_config.py tests/conftest.py tests/unit tests/integration tests/security scripts
+      - run: ruff check overcall/config.py overcall/deps.py overcall/errors.py overcall/logging.py overcall/main.py overcall/models.py overcall/db overcall/pricing overcall/pricing_config.py overcall/detection overcall/api overcall/mock_openai overcall/proxy overcall/auth overcall/synthetic tests/conftest.py tests/unit tests/integration tests/security scripts
       - run: python scripts/check_legacy_dependencies.py
       - run: python scripts/check_pricing_age.py
+      - run: python scripts/check_contract.py
       - run: pytest
